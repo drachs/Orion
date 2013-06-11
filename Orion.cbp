@@ -22,6 +22,11 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="Makefile" />
+		<Unit filename="OrionClient_Console.cpp" />
+		<Unit filename="OrionServer.cpp" />
+		<Unit filename="README.md" />
+		<Unit filename="Universe.thrift" />
 		<Extensions>
 			<code_completion />
 			<debugger />

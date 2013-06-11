@@ -4,9 +4,11 @@
 #include <stdint.h>
 #include "gen-cpp/Universe.h"
 #include <thrift/protocol/TBinaryProtocol.h>
-#include <thrift/server/TSimpleServer.h>
 #include <thrift/transport/TServerSocket.h>
 #include <thrift/transport/TBufferTransports.h>
+#include <thrift/concurrency/ThreadManager.h>
+#include <thrift/concurrency/PosixThreadFactory.h>
+#include <thrift/server/TThreadedServer.h>
 
 using namespace ::apache::thrift;
 using namespace ::apache::thrift::protocol;
@@ -17,34 +19,55 @@ using boost::shared_ptr;
 
 using namespace  ::Orion::Universe;
 
-class UniverseHandler : virtual public UniverseIf {
- public:
-  UniverseHandler() {
-    // Your initialization goes here
-  }
+class UniverseHandler : virtual public UniverseIf
+{
+public:
+    UniverseHandler()
+    {
+        // Your initialization goes here
+    }
 
-  void LongRangeScan(std::map<std::string, Anomaly> & _return) {
-    // Your implementation goes here
-    printf("LongRangeScan\n");
-  }
+    void LongRangeScan(std::map<std::string, Anomaly> & _return)
+    {
+        // Your implementation goes here
+        printf("LongRangeScan\n");
+    }
 
-  void Ping(void) {
-    // Your implementation goes here
-    printf("Ping\n");
-  }
+    void Ping(void)
+    {
+        // Your implementation goes here
+        printf("Ping\n");
+    }
+
+	void LongWait(void)
+	{
+		sleep(60);
+	}
 
 };
 
-int main(int argc, char **argv) {
-  int port = 9090;
-  shared_ptr<UniverseHandler> handler(new UniverseHandler());
-  shared_ptr<TProcessor> processor(new UniverseProcessor(handler));
-  shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));
-  shared_ptr<TTransportFactory> transportFactory(new TBufferedTransportFactory());
-  shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
+int main(int argc, char **argv)
+{
+    shared_ptr<UniverseHandler> handler(new UniverseHandler());
+    shared_ptr<TProcessor> processor(new UniverseProcessor(handler));
 
-  TSimpleServer server(processor, serverTransport, transportFactory, protocolFactory);
-  server.serve();
-  return 0;
+    shared_ptr<TServerTransport> serverTransport (new TServerSocket(9090));
+
+    shared_ptr<TTransportFactory> transportFactory(new TBufferedTransportFactory());
+
+    shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
+
+    //shared_ptr<ThreadManager> threadManager = ThreadManager::newSimpleThreadManager(15);
+    //shared_ptr<PosixThreadFactory> threadFactory = shared_ptr<PosixThreadFactory>(new PosixThreadFactory());
+    //threadManager->threadFactory(threadFactory);
+    //threadManager->start();
+
+    TThreadedServer server(processor,
+                           serverTransport,
+                           transportFactory,
+                           protocolFactory);
+
+    server.serve();
+    return 0;
 }
 
