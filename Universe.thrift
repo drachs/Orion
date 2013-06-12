@@ -30,6 +30,7 @@ struct Anomaly {
 
 service Universe {
     map<string, Anomaly> LongRangeScan(),
+    map<string, Anomaly> ShortRangeScan(),
 
     void Ping(), // Short ping to test connectivity
     void LongWait() // A long wait for testing

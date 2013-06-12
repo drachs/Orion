@@ -25,7 +25,6 @@ class UniverseHandler : virtual public UniverseIf
 public:
     UniverseHandler()
     {
-        // Your initialization goes here
         UniverseData["Star_Sol"].id = "Star_Sol";
         UniverseData["Star_Sol"].__isset.Position = true;
         UniverseData["Star_Sol"].Position.Position.x = 0;
@@ -35,8 +34,6 @@ public:
         UniverseData["Star_Sol"].__isset.GravityWell = true;
         UniverseData["Star_Sol"].GravityWell.Mass = 1.989 * pow(10,30);
 
-
-        // Your initialization goes here
         UniverseData["Planet_Earth"].id = "Planet_Earth";
         UniverseData["Planet_Earth"].__isset.Position = true;
         UniverseData["Planet_Earth"].Position.Position.x = 0;
@@ -45,13 +42,33 @@ public:
 
         UniverseData["Planet_Earth"].__isset.GravityWell = true;
         UniverseData["Planet_Earth"].GravityWell.Mass = 5.972 * pow(10,24);
+        
+        LocalData["Asteroid_AA01"].id = "Asteroid_AA01";
+        LocalData["Asteroid_AA01"].__isset.Position = true;
+        LocalData["Asteroid_AA01"].Position.Position.x = 23123300;
+        LocalData["Asteroid_AA01"].Position.Position.y = 52960000;
+        LocalData["Asteroid_AA01"].Position.Position.z = 32322440;
 
+        LocalData["Asteroid_AA01"].__isset.GravityWell = true;
+        LocalData["Asteroid_AA01"].GravityWell.Mass = 4.251 * pow(10,20);
+        
+        LocalData["Entity_Box"].id = "Entity_Box";
+        LocalData["Entity_Box"].__isset.Position = true;
+        LocalData["Entity_Box"].Position.Position.x = 23123300;
+        LocalData["Entity_Box"].Position.Position.y = 52960000;
+        LocalData["Entity_Box"].Position.Position.z = 32322440;
     }
 
     void LongRangeScan(std::map<std::string, Anomaly> & _return)
     {
         // Your implementation goes here
         _return = UniverseData;
+    }
+    
+    void ShortRangeScan(std::map<std::string, Anomaly> & _return)
+    {
+        // Your implementation goes here
+        _return = LocalData;
     }
 
     void Ping(void)
@@ -67,6 +84,7 @@ public:
 
 private:
 	std::map<std::string, Anomaly> UniverseData;
+	std::map<std::string, Anomaly> LocalData;
 
 };
 
