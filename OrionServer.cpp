@@ -9,6 +9,7 @@
 #include <thrift/concurrency/ThreadManager.h>
 #include <thrift/concurrency/PosixThreadFactory.h>
 #include <thrift/server/TThreadedServer.h>
+#include <math.h>
 
 using namespace ::apache::thrift;
 using namespace ::apache::thrift::protocol;
@@ -25,12 +26,32 @@ public:
     UniverseHandler()
     {
         // Your initialization goes here
+        UniverseData["Star_Sol"].id = "Star_Sol";
+        UniverseData["Star_Sol"].__isset.Position = true;
+        UniverseData["Star_Sol"].Position.Position.x = 0;
+        UniverseData["Star_Sol"].Position.Position.y = 0;
+        UniverseData["Star_Sol"].Position.Position.z = 0;
+
+        UniverseData["Star_Sol"].__isset.GravityWell = true;
+        UniverseData["Star_Sol"].GravityWell.Mass = 1.989 * pow(10,30);
+
+
+        // Your initialization goes here
+        UniverseData["Planet_Earth"].id = "Planet_Earth";
+        UniverseData["Planet_Earth"].__isset.Position = true;
+        UniverseData["Planet_Earth"].Position.Position.x = 0;
+        UniverseData["Planet_Earth"].Position.Position.y = 92960000;
+        UniverseData["Planet_Earth"].Position.Position.z = 0;
+
+        UniverseData["Planet_Earth"].__isset.GravityWell = true;
+        UniverseData["Planet_Earth"].GravityWell.Mass = 5.972 * pow(10,24);
+
     }
 
     void LongRangeScan(std::map<std::string, Anomaly> & _return)
     {
         // Your implementation goes here
-        printf("LongRangeScan\n");
+        _return = UniverseData;
     }
 
     void Ping(void)
@@ -43,6 +64,9 @@ public:
 	{
 		sleep(60);
 	}
+
+private:
+	std::map<std::string, Anomaly> UniverseData;
 
 };
 

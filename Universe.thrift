@@ -6,16 +6,16 @@ struct Vector {
     3: double z
 }
 
-struct PositionType {
+struct TPosition {
 	1: Vector Position,
 	2: Vector Velocity
 }
 
-struct GravityWellType {
-	1: double mass
+struct TGravityWell {
+	1: double Mass
 }
 
-struct MeshType {
+struct TMesh {
 	1: string name,
 	2: double scale,
 	3: Vector orientation,
@@ -23,13 +23,14 @@ struct MeshType {
 
 struct Anomaly {
     1: string id,
-    2: optional PositionType Position,
-    3: optional GravityWellType GravityWell,
-    4: optional MeshType Mesh,
+    2: optional TPosition Position,
+    3: optional TGravityWell GravityWell,
+    4: optional TMesh Mesh,
 }
 
 service Universe {
     map<string, Anomaly> LongRangeScan(),
-    void Ping(),
-    void LongWait()
+
+    void Ping(), // Short ping to test connectivity
+    void LongWait() // A long wait for testing
 }
