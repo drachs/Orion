@@ -22,14 +22,30 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="ClientNet.cpp" />
+		<Unit filename="ClientNet.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="Makefile" />
 		<Unit filename="OrionClient_Console.cpp" />
 		<Unit filename="OrionServer.cpp" />
 		<Unit filename="README.md" />
 		<Unit filename="Universe.thrift" />
+		<Unit filename="thread.cpp" />
+		<Unit filename="thread.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />
+			<DoxyBlocks>
+				<comment_style block="0" line="0" />
+				<doxyfile_project />
+				<doxyfile_build />
+				<doxyfile_warnings />
+				<doxyfile_output />
+				<doxyfile_dot />
+				<general />
+			</DoxyBlocks>
+			<envvars />
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

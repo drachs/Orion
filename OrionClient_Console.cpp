@@ -1,52 +1,25 @@
-#include "gen-cpp/Universe.h"
-
-#include <thrift/transport/TSocket.h>
-#include <thrift/transport/TBufferTransports.h>
-#include <thrift/protocol/TBinaryProtocol.h>
-
 #include <iostream>
+#include "ClientNet.h"
 
-using namespace apache::thrift;
-using namespace apache::thrift::protocol;
-using namespace apache::thrift::transport;
-
-using namespace  ::Orion::Universe;
 using namespace std;
-
-UniverseClient *OrionClient;
 
 void LongRangeScan(void);
 
 int main(int argc, char **argv)
 {
-    boost::shared_ptr<TSocket> socket(new TSocket("localhost", 9090));
-    boost::shared_ptr<TTransport> transport(new TBufferedTransport(socket));
-    boost::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
-
-	OrionClient = new UniverseClient(protocol);
-
-    transport->open();
-
-	printf("Ping: ");
-	fflush(stdout);
-    OrionClient->Ping();
-    printf("Done\n");
-
-	LongRangeScan();
-
-    transport->close();
-
-    return 0;
+	ClientNet *TheClientNet = new ClientNet();
+    while(1)
+        sleep(1000);
 }
 
-
+/*
 void LongRangeScan(void)
 	{
 	std::map<std::string, Anomaly> UniverseData;
 
 	OrionClient->send_LongRangeScan();
 	OrionClient->send_ShortRangeScan();
-	
+
 	cout << endl << "Long Range Scan Data:" << endl;
 	OrionClient->recv_LongRangeScan(UniverseData);
 	for (	std::map<std::string, Anomaly>::iterator i = UniverseData.begin();
@@ -70,7 +43,7 @@ void LongRangeScan(void)
 		}
 
     cout << endl << endl << "Short Range Scan Data: " << endl;
-    
+
     OrionClient->recv_ShortRangeScan(UniverseData);
 	for (	std::map<std::string, Anomaly>::iterator i = UniverseData.begin();
 			i != UniverseData.end();
@@ -92,3 +65,4 @@ void LongRangeScan(void)
 		cout << endl;
 		}
 	}
+*/

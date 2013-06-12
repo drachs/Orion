@@ -42,7 +42,7 @@ public:
 
         UniverseData["Planet_Earth"].__isset.GravityWell = true;
         UniverseData["Planet_Earth"].GravityWell.Mass = 5.972 * pow(10,24);
-        
+
         LocalData["Asteroid_AA01"].id = "Asteroid_AA01";
         LocalData["Asteroid_AA01"].__isset.Position = true;
         LocalData["Asteroid_AA01"].Position.Position.x = 23123300;
@@ -51,7 +51,7 @@ public:
 
         LocalData["Asteroid_AA01"].__isset.GravityWell = true;
         LocalData["Asteroid_AA01"].GravityWell.Mass = 4.251 * pow(10,20);
-        
+
         LocalData["Entity_Box"].id = "Entity_Box";
         LocalData["Entity_Box"].__isset.Position = true;
         LocalData["Entity_Box"].Position.Position.x = 23123300;
@@ -64,7 +64,7 @@ public:
         // Your implementation goes here
         _return = UniverseData;
     }
-    
+
     void ShortRangeScan(std::map<std::string, Anomaly> & _return)
     {
         // Your implementation goes here
