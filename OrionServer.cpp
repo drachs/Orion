@@ -62,12 +62,14 @@ public:
     void LongRangeScan(std::map<std::string, Anomaly> & _return)
     {
         // Your implementation goes here
+        printf("LongRangeScan\n");
         _return = UniverseData;
     }
 
     void ShortRangeScan(std::map<std::string, Anomaly> & _return)
     {
         // Your implementation goes here
+        printf("ShortRangeScan\n");
         _return = LocalData;
     }
 

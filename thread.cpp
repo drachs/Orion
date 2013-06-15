@@ -85,6 +85,14 @@ void mutex::lock(void)
     pthread_mutex_lock(&internal_mutex);
     }
 
+bool mutex::trylock(void)
+    {
+    if (pthread_mutex_trylock(&internal_mutex) == 0) // Locking successful
+        return(true);
+    else
+        return(false);
+    }
+
 void mutex::unlock(void)
     {
     pthread_mutex_unlock(&internal_mutex);

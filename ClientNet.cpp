@@ -3,16 +3,9 @@
 #include <iostream>
 #include <sys/time.h>
 
-#include <thrift/transport/TSocket.h>
-#include <thrift/transport/TBufferTransports.h>
-#include <thrift/protocol/TBinaryProtocol.h>
-
 using namespace apache::thrift;
 using namespace apache::thrift::protocol;
 using namespace apache::thrift::transport;
-
-using namespace  ::Orion::Universe;
-
 using namespace std;
 
 #define MS_BETWEEN_SERVER_UPDATES 100
@@ -20,35 +13,40 @@ using namespace std;
 /**
  * Handles com with the server
  */
-ClientNet::ClientNet()
+ClientNet::ClientNet(boost::shared_ptr<apache::thrift::protocol::TProtocol> protocol)
+    : UniverseClient(protocol), Clients()
 {
+    ComMutex.lock();
+
+    PollRate = MS_BETWEEN_SERVER_UPDATES;
+
     printf("ClientNet\n");
-
-    boost::shared_ptr<TSocket> socket(new TSocket("localhost", 9090));
-    boost::shared_ptr<TTransport> transport(new TBufferedTransport(socket));
-    boost::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
-
-    OrionClient = new UniverseClient(protocol);
-
-    transport->open();
 
     printf("Ping: ");
     fflush(stdout);
-    OrionClient->Ping();
+    this->Ping();
     printf("Done\n");
 
     startThread();
+    ComMutex.unlock();
 }
 
-ClientNet::~ClientNet()
+void ClientNet::RegisterCallbackObject(OrionClient *ptr)
 {
-    //transport->close();
+    ComMutex.lock();
+    Clients.push_back(ptr);
+    ComMutex.unlock();
+}
+
+void ClientNet::UnregisterCallbackObject(OrionClient *ptr)
+{
+    ComMutex.lock();
+    Clients.remove(ptr);
+    ComMutex.unlock();
 }
 
 void ClientNet::task(void)
 {
-    std::map<std::string, Anomaly> LongRangeData;
-    std::map<std::string, Anomaly> ShortRangeData;
     struct timeval  tv;
 
     while(1)
@@ -56,11 +54,36 @@ void ClientNet::task(void)
         gettimeofday(&tv, NULL);
         double start_time = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
 
-        OrionClient->send_LongRangeScan();
-        OrionClient->send_ShortRangeScan();
+        ComMutex.lock();
+        // send
+        for (	std::list<OrionClient *>::iterator i = Clients.begin();
+                i != Clients.end();
+                i++)
+        {
+            if ((*i)->BusyLock.trylock())
+                {
+                (*i)->Sending = true;
+                (*i)->Send();
+                }
+            else
+                (*i)->Sending = false;
+        }
 
-        OrionClient->recv_LongRangeScan(LongRangeData);
-        OrionClient->recv_ShortRangeScan(ShortRangeData);
+
+        // recv
+        for (	std::list<OrionClient *>::iterator i = Clients.begin();
+                i != Clients.end();
+                i++)
+        {
+            if ((*i)->Sending)
+            {
+                (*i)->Recv();
+                (*i)->Wakeup();
+                (*i)->BusyLock.unlock();
+            }
+        }
+
+        ComMutex.unlock();
 
         gettimeofday(&tv, NULL);
         double end_time = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000 ;
@@ -68,8 +91,44 @@ void ClientNet::task(void)
         double difference = (MS_BETWEEN_SERVER_UPDATES - (end_time - start_time));
         if (difference > 0)
             usleep(difference*1000);
-		else
-			printf("Error, data transfer taking too long\n");
+        else
+            printf("Error, not maintaining pace with networking heartbeat\n");
     }
 }
+
+OrionClient::OrionClient(ClientNet *ptr)
+    : ClientNetwork(ptr)
+{
+    startThread();
+}
+
+OrionClient::~OrionClient(void)
+{
+    Stop();
+}
+
+void OrionClient::Wakeup(void)
+{
+    BusyLock.signal();
+}
+
+void OrionClient::task(void)
+{
+    BusyLock.lock();
+    while(1)
+        {
+        BusyLock.wait(); // Releases the mutex while waiting, reaquires before return
+        Process();
+        }
+}
+
+void OrionClient::Start(void)
+    {
+    ClientNetwork->RegisterCallbackObject(this);
+    }
+
+void OrionClient::Stop(void)
+    {
+    ClientNetwork->UnregisterCallbackObject(this);
+    }
 

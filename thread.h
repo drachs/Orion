@@ -21,6 +21,10 @@ public:
 
 	/// Unlock the mutex.
     void unlock(void);
+
+    /// Try to lock the mutex.  Returns true if successfull.
+    bool trylock(void);
+
     mutex();
     ~mutex();
 
@@ -42,6 +46,7 @@ public:
 
 	/// Unlock the mutex.
     void unlock(void);
+
     recursiveMutex();
     ~recursiveMutex();
 
