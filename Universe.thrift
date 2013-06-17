@@ -1,14 +1,14 @@
 namespace cpp Orion.Universe
 
-struct Vector {
+struct netVector {
     1: double x,
     2: double y,
     3: double z
 }
 
 struct netPosition {
-	1: Vector Position,
-	2: Vector Velocity
+	1: netVector Position,
+	2: netVector Velocity
 }
 
 struct netGravityWell {
@@ -16,12 +16,12 @@ struct netGravityWell {
 }
 
 struct netMesh {
-	1: string name,
-	2: double scale,
-	3: Vector orientation,
+	1: string MeshName,
+	2: double Scale,
+	3: netVector Orientation,
 }
 
-struct Anomaly {
+struct netAnomaly {
     1: string id,
     2: optional netPosition Position,
     3: optional netGravityWell GravityWell,
@@ -29,8 +29,21 @@ struct Anomaly {
 }
 
 service Universe {
-    map<string, Anomaly> LongRangeScan(),
-    map<string, Anomaly> ShortRangeScan(),
+    /**
+     * Scan for data using the long range scanners
+     */
+    map<string, netAnomaly> LongRangeScan(),
+
+    /**
+     * Scan for data using the short range scanners
+     */
+    map<string, netAnomaly> ShortRangeScan(),
+
+    /**
+     * Set the thrust vector and magnitude
+     */
+    oneway void SetEngineVector(1:netVector Direction, 2:double Magnitude),
+
 
     void Ping(), // Short ping to test connectivity
     void LongWait() // A long wait for testing

@@ -20,10 +20,10 @@ public:
     void Recv(void);
     void Process(void);
 
-    std::map<std::string, ::Orion::Universe::Anomaly> UniverseData;
-    std::map<std::string, ::Orion::Universe::Anomaly> LocalData;
+    std::map<std::string, ::Orion::Universe::netAnomaly> UniverseData;
+    std::map<std::string, ::Orion::Universe::netAnomaly> LocalData;
 
-    void PrintScanData(std::map<std::string, ::Orion::Universe::Anomaly> &Data);
+    void PrintScanData(std::map<std::string, ::Orion::Universe::netAnomaly> &Data);
 };
 
 /**
@@ -62,17 +62,27 @@ void ExampleClient::Process(void)
     cout << endl << "Short Range Scan Data: " << endl;
     PrintScanData(LocalData);
 
+    // Lock the ComMutex before making any network calls
+    ClientNetwork->ComMutex.lock();
+    // Limit yourself to "oneway" thrift calls to prevent induction of latency
+    netVector EngineVector;
+    EngineVector.x = 10;
+    EngineVector.y = 25;
+    EngineVector.z = 50;
+    ClientNetwork->SetEngineVector(EngineVector, 10);
+    ClientNetwork->ComMutex.unlock();
+
     sleep(5);
     }
 
 /// Print some space stuff
-void ExampleClient::PrintScanData(std::map<std::string, ::Orion::Universe::Anomaly> &Data)
+void ExampleClient::PrintScanData(std::map<std::string, ::Orion::Universe::netAnomaly> &Data)
     {
-	for (	std::map<std::string, Anomaly>::iterator i = Data.begin();
+	for (	std::map<std::string, netAnomaly>::iterator i = Data.begin();
 			i != Data.end();
 			i++)
 		{
-		Anomaly &Result = i->second;
+		netAnomaly &Result = i->second;
 
 		cout << "Detected object: " << Result.id << endl;
 		if (Result.__isset.Position)

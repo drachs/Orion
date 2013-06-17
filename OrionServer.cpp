@@ -19,6 +19,7 @@ using namespace ::apache::thrift::server;
 using boost::shared_ptr;
 
 using namespace  ::Orion::Universe;
+using namespace std;
 
 class UniverseHandler : virtual public UniverseIf
 {
@@ -59,18 +60,23 @@ public:
         LocalData["Entity_Box"].Position.Position.z = 32322440;
     }
 
-    void LongRangeScan(std::map<std::string, Anomaly> & _return)
+    void LongRangeScan(std::map<std::string, netAnomaly> & _return)
     {
         // Your implementation goes here
         printf("LongRangeScan\n");
         _return = UniverseData;
     }
 
-    void ShortRangeScan(std::map<std::string, Anomaly> & _return)
+    void ShortRangeScan(std::map<std::string, netAnomaly> & _return)
     {
         // Your implementation goes here
         printf("ShortRangeScan\n");
         _return = LocalData;
+    }
+
+    void SetEngineVector(const Orion::Universe::netVector& Vector, double Magnitude)
+    {
+        cout << "SetEngineVector: " << Vector.x << ", " << Vector.y << ", " << Vector.z << " " << Magnitude << endl;
     }
 
     void Ping(void)
@@ -85,8 +91,8 @@ public:
 	}
 
 private:
-	std::map<std::string, Anomaly> UniverseData;
-	std::map<std::string, Anomaly> LocalData;
+	std::map<std::string, netAnomaly> UniverseData;
+	std::map<std::string, netAnomaly> LocalData;
 
 };
 
