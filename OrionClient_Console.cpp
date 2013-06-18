@@ -110,6 +110,10 @@ int main(int argc, char **argv)
 
 	ClientNet ClientNetwork(protocol);
 
+    ClientNetwork.ComMutex.lock();
+    ClientNetwork.JoinShip("Orion", "ExampleClient");
+    ClientNetwork.ComMutex.unlock();
+
 	ExampleClient myExampleClient(&ClientNetwork);
 	myExampleClient.Start();
 

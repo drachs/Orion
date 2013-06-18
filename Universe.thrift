@@ -40,6 +40,13 @@ service Universe {
     map<string, netAnomaly> ShortRangeScan(),
 
     /**
+     * Join a ship
+     * @param id The object id of the ship to join
+     * @param StationDescription A text description to describe this station
+     */
+     bool JoinShip(1: string id, 2: string StationDescription),
+
+    /**
      * Set the thrust vector and magnitude
      */
     oneway void SetEngineVector(1:netVector Direction, 2:double Magnitude),

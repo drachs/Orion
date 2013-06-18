@@ -9,7 +9,10 @@
 #include <thrift/concurrency/ThreadManager.h>
 #include <thrift/concurrency/PosixThreadFactory.h>
 #include <thrift/server/TThreadedServer.h>
+#include "boost/thread/tss.hpp"
+#include "thread.h"
 #include <math.h>
+#include <string.h>
 
 using namespace ::apache::thrift;
 using namespace ::apache::thrift::protocol;
@@ -25,6 +28,7 @@ class UniverseHandler : virtual public UniverseIf
 {
 public:
     UniverseHandler()
+    : ClientNumber(0)
     {
         UniverseData["Star_Sol"].id = "Star_Sol";
         UniverseData["Star_Sol"].__isset.Position = true;
@@ -63,26 +67,36 @@ public:
     void LongRangeScan(std::map<std::string, netAnomaly> & _return)
     {
         // Your implementation goes here
-        printf("LongRangeScan\n");
+        cout << *StationDescription << ": LongRangeScan" << endl;
         _return = UniverseData;
     }
 
     void ShortRangeScan(std::map<std::string, netAnomaly> & _return)
     {
         // Your implementation goes here
-        printf("ShortRangeScan\n");
+        cout << *StationDescription << ": ShortRangeScan" << endl;
         _return = LocalData;
     }
 
     void SetEngineVector(const Orion::Universe::netVector& Vector, double Magnitude)
     {
-        cout << "SetEngineVector: " << Vector.x << ", " << Vector.y << ", " << Vector.z << " " << Magnitude << endl;
+        cout << *StationDescription << ": SetEngineVector: " << Vector.x << ", " << Vector.y << ", " << Vector.z << " " << Magnitude << endl;
+    }
+
+    bool JoinShip(const string &id, const string &StationDescription_in)
+    {
+    ServerLock.lock();
+    int myClientNumber = ClientNumber++;
+    ServerLock.unlock();
+
+
+    StationDescription.reset(new string(StationDescription_in+" "+to_string(myClientNumber)));
     }
 
     void Ping(void)
     {
         // Your implementation goes here
-        printf("Ping\n");
+        cout << "Ping" << endl;
     }
 
 	void LongWait(void)
@@ -94,18 +108,23 @@ private:
 	std::map<std::string, netAnomaly> UniverseData;
 	std::map<std::string, netAnomaly> LocalData;
 
+	boost::thread_specific_ptr<string> StationDescription;
+
+    mutex ServerLock;
+
+    unsigned int ClientNumber;
 };
 
 int main(int argc, char **argv)
 {
-    shared_ptr<UniverseHandler> handler(new UniverseHandler());
-    shared_ptr<TProcessor> processor(new UniverseProcessor(handler));
+    boost::shared_ptr<UniverseHandler> handler(new UniverseHandler());
+    boost::shared_ptr<TProcessor> processor(new UniverseProcessor(handler));
 
-    shared_ptr<TServerTransport> serverTransport (new TServerSocket(9090));
+    boost::shared_ptr<TServerTransport> serverTransport (new TServerSocket(9090));
 
-    shared_ptr<TTransportFactory> transportFactory(new TBufferedTransportFactory());
+    boost::shared_ptr<TTransportFactory> transportFactory(new TBufferedTransportFactory());
 
-    shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
+    boost::shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
 
     //shared_ptr<ThreadManager> threadManager = ThreadManager::newSimpleThreadManager(15);
     //shared_ptr<PosixThreadFactory> threadFactory = shared_ptr<PosixThreadFactory>(new PosixThreadFactory());

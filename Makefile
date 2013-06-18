@@ -1,11 +1,11 @@
 OBS = thread.o ClientNet.o gen-cpp/Universe_constants.o gen-cpp/Universe.o gen-cpp/Universe_types.o
 # Work around thrift compile bug
-CPPFLAGS = -g -DHAVE_NETINET_IN_H -DHAVE_INTTYPES_H
+CPPFLAGS = -std=c++0x -g -DHAVE_NETINET_IN_H -DHAVE_INTTYPES_H
 
 all : OrionServer OrionClient_Console
 
 OrionServer : gen-cpp ${OBS} OrionServer.o
-	g++ -o OrionServer OrionServer.o ${OBS} -lthrift
+	g++ -o OrionServer OrionServer.o ${OBS} -lthrift -lboost_thread
 
 OrionClient_Console : gen-cpp ${OBS} OrionClient_Console.o
 	g++ -o OrionClient_Console OrionClient_Console.o ${OBS} -lthrift
